@@ -3,7 +3,7 @@ import React from "react";
 
 export default class ObjectUtil {
     static isNull(val: any): boolean {
-        return val == null || val == undefined;
+        return val == null;
     }
 
     static isNotNull(val: any): boolean {

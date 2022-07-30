@@ -36,7 +36,7 @@ function Search() {
 function ContactCell() {
     const icon = require("./style/icon.jpeg")
     return (<div style={{
-        margin: "14px 0"
+        margin: "3vh 0"
     }}>
         <Row>
             <Col span={5}>
@@ -83,19 +83,36 @@ export default function Home(props: any) {
     })
 
 
+
     const renderEditArea = () => {
-        return (<div></div>)
+        return (<div style={{
+            borderStyle: "ridge",
+            width: "calc(100vw - 320px)",
+            height: "200px"
+        }}>
+            <div id={"toolbar"} style={{
+                padding: "10px 0"
+            }}>
+                toolbar
+            </div>
+            <textarea style={{
+                height: "160px",
+                width: "100%"
+            }}/>
+        </div>)
     }
 
     const renderMsgArea = () => {
-        return (<div>
+        return (<div style={{
+            width: "calc(100vw - 320px)"
+        }}>
             <div style={{
                 padding: "10px 30px",
                 fontWeight: "bold"
             }}>魔法少女 (1270089850)</div>
             <div style={{
                 padding: "10px 30px",
-                maxHeight: "calc(100vh - 40px)",
+                maxHeight: "calc(95vh - 40px - 200px)",
                 overflowY: "auto",
             }}>
                 {ObjectUtil.forElement(<div style={{
@@ -113,13 +130,13 @@ export default function Home(props: any) {
         }
         return (<div style={{
             borderStyle: "ridge",
-            height: "100vh",
-            padding: "0 1vh"
+            padding: "0 1vh",
+            width: "300px"
         }}>
             {Search()}
             <div style={{
-                maxHeight: "calc(100vh-20px)",
                 overflowY: "auto",
+                height: "calc(95vh - 15px)"
             }}>
                 {allCell}
             </div>
@@ -128,12 +145,25 @@ export default function Home(props: any) {
 
     return (
         <div>
-            <Row>
-                <Col span={7}>
+            <Row style={{
+                maxHeight: "95vh"
+            }}>
+                <Col style={{
+                    width: "315px",
+                    maxHeight: "100%",
+                    overflowY: "auto"
+                }}>
                     {renderChatSide()}
                 </Col>
-                <Col span={17}>
-                    {renderMsgArea()}
+                <Col style={{
+                    width: "calc(100vw-340px)"
+                }}>
+                    <Row>
+                        {renderMsgArea()}
+                    </Row>
+                    <Row>
+                        {renderEditArea()}
+                    </Row>
                 </Col>
             </Row>
         </div>

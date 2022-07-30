@@ -9,6 +9,7 @@ import HttpClient from "../common/component/HttpClient";
 import HttpURL from "../common/env/HttpURL";
 import RouterUtil from "../common/utils/RouterUtil";
 import RouterURL from "../common/env/RouterURL";
+import WsClient from "./WsConn";
 
 const STATUS = {
     "LOGIN": 0,
@@ -145,8 +146,18 @@ export class Login extends React.Component<Props, State> {
             }, resp => {
                 if (localStorage.getItem("autoLogin") === "true") {
                     localStorage.setItem("auth", resp.data.token)
-                }else {
+                } else {
                     sessionStorage.setItem("auth", resp.data.token)
+                }
+                // connect to websocket
+                const wsc = WsClient.Client(() => {
+
+                }, (msg: string) => {
+
+                })
+                if (!wsc.available()) {
+                    Notification.error("连接服务器失败")
+                    return
                 }
                 RouterUtil.push(RouterURL.HOME)
             }, err => {
