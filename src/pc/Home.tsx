@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {Col, Row} from "antd";
+import {Col, Modal, Row} from "antd";
 import ObjectUtil from "../common/utils/ObjectUtil";
+import AddContact from "./AddContact";
 
 
 function Search() {
@@ -33,7 +34,7 @@ function Search() {
     </div>
 }
 
-function ContactCell() {
+export function ContactCell() {
     const icon = require("./style/icon.jpeg")
     return (<div style={{
         margin: "3vh 0"
@@ -58,9 +59,9 @@ function ContactCell() {
                 </Row>
                 <Row>
                     <label style={{
-                    color: "#979696",
-                    fontSize: "smaller"
-                }}>上次开会说的事，你那边开始...
+                        color: "#979696",
+                        fontSize: "smaller"
+                    }}>上次开会说的事，你那边开始...
                     </label>
                 </Row>
             </Col>
@@ -78,10 +79,10 @@ function ContactCell() {
 export default function Home(props: any) {
 
     const [friendCount, setFriendCount] = useState(20)
+    const [addContactVisible, setAddContactVisible] = useState(false)
 
     useEffect(() => {
     })
-
 
 
     const renderEditArea = () => {
@@ -109,7 +110,8 @@ export default function Home(props: any) {
             <div style={{
                 padding: "10px 30px",
                 fontWeight: "bold"
-            }}>魔法少女 (1270089850)</div>
+            }}>魔法少女 (1270089850)
+            </div>
             <div style={{
                 padding: "10px 30px",
                 maxHeight: "calc(95vh - 40px - 200px)",
@@ -124,6 +126,7 @@ export default function Home(props: any) {
 
 
     const renderChatSide = () => {
+        const addIcon = require("./style/addcontact.png")
         let allCell = []
         for (let i = 0; i < friendCount; i++) {
             allCell.push(ContactCell())
@@ -133,7 +136,14 @@ export default function Home(props: any) {
             padding: "0 1vh",
             width: "300px"
         }}>
-            {Search()}
+            <div style={{
+                display: "flex"
+            }}>
+                {Search()}
+                <div><img src={addIcon} onClick={() => {
+                    setAddContactVisible(true)
+                }}/></div>
+            </div>
             <div style={{
                 overflowY: "auto",
                 height: "calc(95vh - 15px)"
@@ -166,6 +176,10 @@ export default function Home(props: any) {
                     </Row>
                 </Col>
             </Row>
+            <Modal visible={addContactVisible}>
+                {AddContact()}
+            </Modal>
         </div>
     )
 }
+

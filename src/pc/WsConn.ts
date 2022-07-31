@@ -13,7 +13,6 @@ export default class WsClient {
     private access = true
 
     constructor(openFunc: () => void, receiveFunc: (msg: string) => void) {
-        debugger
         if (ObjectUtil.isNull(WsConn)) {
             const token = StorageUtil.get("auth")
             if (token != null) {
