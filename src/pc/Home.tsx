@@ -2,6 +2,9 @@ import React, {useEffect, useState} from "react";
 import {Col, Modal, Row} from "antd";
 import ObjectUtil from "../common/utils/ObjectUtil";
 import AddContact from "./AddContact";
+import WsClient from "./WsConn";
+import {Notification} from "../common/component/Notification";
+import WsResp from "./model/WsResp";
 
 
 function Search() {
@@ -34,10 +37,17 @@ function Search() {
     </div>
 }
 
-export function ContactCell() {
+export function ContactCell(props: {
+    key: string
+    senderNick: string
+    message: string
+    dateTime: string
+}) {
     const icon = require("./style/icon.jpeg")
-    return (<div style={{
-        margin: "3vh 0"
+    const fmtMsg = props.message.length > 13 ? props.message.substring(0, 13) + "..." : props.message
+    return (<div key={props.key} style={{
+        margin: "3vh 0",
+
     }}>
         <Row>
             <Col span={5}>
@@ -54,14 +64,14 @@ export function ContactCell() {
                     <label style={{
                         fontWeight: "bolder"
                     }}>
-                        张三2
+                        {props.senderNick}
                     </label>
                 </Row>
                 <Row>
                     <label style={{
                         color: "#979696",
                         fontSize: "smaller"
-                    }}>上次开会说的事，你那边开始...
+                    }}>{fmtMsg}
                     </label>
                 </Row>
             </Col>
@@ -69,20 +79,42 @@ export function ContactCell() {
                 <Row><label style={{
                     fontSize: "smaller",
                     color: "#979696"
-                }}>23:12</label></Row>
+                }}>{props.dateTime}</label></Row>
                 <Row></Row>
             </Col>
         </Row>
     </div>)
 }
 
+class MessageM{
+    message: string = ""
+    senderNick: string = ""
+    messageTime: string = ""
+    id: string = ""
+}
+
 export default function Home(props: any) {
 
-    const [friendCount, setFriendCount] = useState(20)
     const [addContactVisible, setAddContactVisible] = useState(false)
+    const [messages, setMessages] = useState(new Array<MessageM>)
+
+    // 监听
+    const receiveMessage = (data: WsResp) => {
+        Notification.success(data.message)
+        messages.push({
+            message: data.message,
+            senderNick: data.senderNick,
+            id: data.senderName,
+            messageTime: data.messageTime
+        })
+        setMessages([...messages])
+    }
 
     useEffect(() => {
+        const clt = WsClient.Client()
+        clt.addReceiveListener(receiveMessage)
     })
+
 
 
     const renderEditArea = () => {
@@ -110,7 +142,7 @@ export default function Home(props: any) {
             <div style={{
                 padding: "10px 30px",
                 fontWeight: "bold"
-            }}>魔法少女 (1270089850)
+            }}>魔法师🧙‍ (1270089850)
             </div>
             <div style={{
                 padding: "10px 30px",
@@ -127,10 +159,14 @@ export default function Home(props: any) {
 
     const renderChatSide = () => {
         const addIcon = require("./style/addcontact.png")
-        let allCell = []
-        for (let i = 0; i < friendCount; i++) {
-            allCell.push(ContactCell())
-        }
+        let allCell = messages.map((v) => {
+            return ContactCell({
+                key: v.id,
+                senderNick: v.senderNick,
+                dateTime: v.messageTime,
+                message: v.message
+            })
+        })
         return (<div style={{
             borderStyle: "ridge",
             padding: "0 1vh",
@@ -159,7 +195,7 @@ export default function Home(props: any) {
                 maxHeight: "95vh"
             }}>
                 <Col style={{
-                    width: "315px",
+                    width: "300px",
                     maxHeight: "100%",
                     overflowY: "auto"
                 }}>

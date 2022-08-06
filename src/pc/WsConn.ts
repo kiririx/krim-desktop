@@ -1,18 +1,20 @@
 import {Notification} from "../common/component/Notification";
 import StorageUtil from "../common/utils/StorageUtil";
 import ObjectUtil from "../common/utils/ObjectUtil";
+import WsResp from "./model/WsResp";
 
 let WsConn: WebSocket
+let wsClient: WsClient
 
 export default class WsClient {
 
     public wsConn: WebSocket
     public send: (targetId: string, msg: string) => void
-    private readonly open: () => void
-    private readonly receive: (msg: string) => void
+    public open?: () => void
+    public receive?: (msg: string) => void
     private access = true
 
-    constructor(openFunc: () => void, receiveFunc: (msg: string) => void) {
+    constructor() {
         if (ObjectUtil.isNull(WsConn)) {
             const token = StorageUtil.get("auth")
             if (token != null) {
@@ -23,16 +25,32 @@ export default class WsClient {
         this.send = (targetId: string, msg: string) => {
             WsConn.send("{\"targetId\":\"" + targetId + "\", \"msg\":\"" + msg + "\"}");
         }
-        this.open = openFunc
-        this.receive = receiveFunc
+        // this.open = openFunc
+        // this.receive = receiveFunc
     }
 
-    public static Client = (openFunc: () => void, receiveFunc: (msg: string) => void) => {
-        return new WsClient(openFunc, receiveFunc)
+    public static Client = () => {
+        if (wsClient == null) {
+            wsClient = new WsClient()
+        }
+        return wsClient
     }
 
     public available = () => {
         return this.access
+    }
+
+    public addReceiveListener = (f: (data: WsResp) => void) => {
+        WsConn.addEventListener('message', (event) => {
+            const resp = new WsResp()
+            const data = JSON.parse(event.data as string)
+            resp.message = data.message
+            resp.senderName = data.sender_name
+            resp.senderNick = data.sender_nick
+            resp.messageType = data.msg_type
+            resp.messageTime = data.msg_time
+            f(resp)
+        });
     }
 
     private conn = (token: string) => {

@@ -150,11 +150,7 @@ export class Login extends React.Component<Props, State> {
                     sessionStorage.setItem("auth", resp.data.token)
                 }
                 // connect to websocket
-                const wsc = WsClient.Client(() => {
-
-                }, (msg: string) => {
-
-                })
+                const wsc = WsClient.Client()
                 if (!wsc.available()) {
                     Notification.error("连接服务器失败")
                     return
